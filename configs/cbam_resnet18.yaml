@@ -1,0 +1,14 @@
+# 改进模型：ResNet18 + CBAM（每个 BasicBlock 内部、残差相加之前插入）
+# 用法：emoji train --config configs/cbam_resnet18.yaml
+_base_: [base.yaml]
+
+run_name: cbam-resnet18
+
+model:
+  name: resnet18_fer
+  use_cbam: true
+  cbam_reduction: 16
+  cbam_kernel_size: 7
+
+train:
+  loss: ce

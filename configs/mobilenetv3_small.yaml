@@ -1,0 +1,13 @@
+# 轻量模型：MobileNetV3-small（实时演示候选）
+# 用法：emoji train --config configs/mobilenetv3_small.yaml
+_base_: [base.yaml]
+
+run_name: mobilenet-v3-small
+
+model:
+  name: mobilenet_v3_small_fer
+  dropout: 0.2
+
+train:
+  lr: 5.0e-4
+  epochs: 30

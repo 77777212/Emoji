@@ -1,0 +1,32 @@
+# 冒烟配置：合成数据 + MobileNetV3-small + 2 epoch，CPU 数十秒可跑完。
+# 说明：冒烟只有 ~15 个训练 step，因此关闭数据增强并先做 BN warmup，
+#       目的是验证「数据→训练→评估」链路可学习、可落盘；合成数据上的精度
+#       不代表真实 FER 性能，正式实验请用 configs/base.yaml 系列。
+# 先运行：emoji synth-data --out data/synth/smoke --samples-per-class 24 --seed 0
+# 再运行：emoji train --config configs/smoke.yaml
+_base_: [base.yaml]
+
+run_name: smoke
+
+data:
+  csv_path: data/synth/smoke/fer2013.csv
+  batch_size: 16
+  num_workers: 0
+  pin_memory: false
+  # 冒烟只跑 2 epoch，关闭增强以便在少量 step 内验证流程可学习性
+  augment: false
+
+model:
+  name: mobilenet_v3_small_fer
+  # 冒烟只有 15 个 batch，先校准 BN 统计量，避免 eval 模式指标异常
+  bn_warmup_batches: 30
+
+train:
+  epochs: 2
+  lr: 1.0e-3
+  warmup_epochs: 0
+  early_stop_patience: 5
+  torch_num_threads: 4
+
+eval:
+  batch_size: 32

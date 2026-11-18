@@ -1,0 +1,78 @@
+# 基础配置：真实 FER2013 训练（CPU 可跑，GPU 更快）
+# 用法：emoji train --config configs/base.yaml
+seed: 42
+output_dir: outputs
+run_name: null
+
+data:
+  task: fer2013
+  root: data/raw/fer2013
+  csv_path: data/raw/fer2013/fer2013.csv
+  # FER2013 原图 48×48；改成 96 可做输入尺寸消融（ResNet18 会切换为标准 stem）
+  image_size: 48
+  in_chans: 1
+  gray_to_rgb: false
+  num_classes: 7
+  class_names: [angry, disgust, fear, happy, sad, surprise, neutral]
+  batch_size: 64
+  num_workers: 4
+  pin_memory: true
+  # 是否对训练集施加数据增强（消融实验可设 false）
+  augment: true
+  # 官方划分：PublicTest 作验证集，PrivateTest 只用于最终评估
+  val_split: PublicTest
+  test_split: PrivateTest
+  # 归一化统计量（灰度图用 0.5/0.5）；gray_to_rgb 时请改成 3 通道的 ImageNet 统计量
+  mean: [0.5]
+  std: [0.5]
+
+model:
+  # resnet18_fer | mobilenet_v3_small_fer | mobilenet_v3_large_fer
+  name: resnet18_fer
+  num_classes: 7
+  dropout: 0.2
+  # 默认 false：离线环境不下载 ImageNet 权重；有网络时可设为 true 做迁移学习
+  pretrained: false
+  use_cbam: false
+  cbam_reduction: 16
+  cbam_kernel_size: 7
+  # BN 动量；torchvision MobileNetV3 默认 0.01，小数据短训练时建议保持 0.1
+  bn_momentum: 0.1
+  # 训练前 BN running stats 校准批次数（正式实验可设 0）
+  bn_warmup_batches: 0
+
+train:
+  epochs: 30
+  optimizer: adamw          # adamw | sgd
+  lr: 3.0e-4
+  weight_decay: 1.0e-4
+  momentum: 0.9
+  scheduler: cosine         # cosine | none
+  warmup_epochs: 1
+  min_lr_ratio: 0.02
+  loss: ce                  # ce | lsce | focal | cbce
+  label_smoothing: 0.05
+  focal_gamma: 2.0
+  class_weight: none        # none | balanced | effective
+  effective_beta: 0.999
+  grad_clip: 5.0
+  amp: auto                 # auto | off（CPU 自动关闭）
+  early_stop_patience: 8    # <=0 关闭早停
+  early_stop_monitor: macro_f1  # macro_f1 | val_loss
+  device: auto              # auto | cpu | cuda | mps
+  deterministic: true
+  torch_num_threads: 0
+  log_interval: 0
+
+eval:
+  split: PrivateTest
+  batch_size: 128
+  device: auto
+  target_layer: ""          # 留空自动选择最后一层卷积 stage
+  top_k: 8
+
+robustness:
+  split: PrivateTest
+  severities: [1, 2, 3, 4, 5]
+  batch_size: 128
+  seed: 42

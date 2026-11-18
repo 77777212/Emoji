@@ -1,0 +1,33 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# 本地工具缓存
+.cache/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# 实验数据（原始数据集不进入版本库）
+data/raw/
+data/processed/
+data/synth/
+!data/README.md
+
+# 实验产物
+outputs/
+runs/
+*.pth
+*.pt
+*.ckpt
+*.onnx
+*.log

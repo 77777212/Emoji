@@ -1,0 +1,55 @@
+[project]
+name = "emoji"
+version = "0.1.0"
+description = "基于深度学习的人脸表情识别：可复现实验与实时演示原型"
+readme = "README.md"
+authors = [
+    { name = "mx", email = "mx18782708114@163.com" }
+]
+requires-python = ">=3.12,<3.16"
+dependencies = [
+    "numpy>=1.26",
+    "torch>=2.6",
+    "torchvision>=0.21",
+    "scikit-learn>=1.4",
+    "matplotlib>=3.8",
+    "pyyaml>=6.0",
+    "tqdm>=4.66",
+]
+
+[project.optional-dependencies]
+# 实时演示所需的额外依赖；核心实验与训练不需要它们。
+demo = [
+    "opencv-python>=4.9",
+    "mediapipe>=0.10",
+]
+
+[project.scripts]
+emoji = "emoji.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.8,<0.14.0"]
+build-backend = "uv_build"
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+torchvision = [{ index = "pytorch-cpu" }]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

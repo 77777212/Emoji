@@ -1,0 +1,13 @@
+# 基线：ResNet18（48×48 改造 stem）+ 交叉熵
+# 用法：emoji train --config configs/baseline_resnet18.yaml
+_base_: [base.yaml]
+
+run_name: baseline-resnet18
+
+model:
+  name: resnet18_fer
+  use_cbam: false
+
+train:
+  loss: ce
+  class_weight: none
